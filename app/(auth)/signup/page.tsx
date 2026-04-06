@@ -1,0 +1,213 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { AlertCircle, BookOpen, CheckCircle } from 'lucide-react';
+
+import { useAuth } from '@/lib/contexts/AuthContext';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+
+export default function SignupPage() {
+  const router = useRouter();
+  const { user, signup, isLoading } = useAuth();
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    agreeTerms: false,
+  });
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (user && !isLoading) {
+      router.push(user.role === 'admin' ? '/admin' : '/dashboard');
+    }
+  }, [user, isLoading, router]);
+
+  const validateForm = (): boolean => {
+    setError('');
+
+    if (!formData.name.trim()) {
+      setError('Name is required');
+      return false;
+    }
+    if (!formData.email.includes('@')) {
+      setError('Please enter a valid email');
+      return false;
+    }
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return false;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return false;
+    }
+    if (!formData.agreeTerms) {
+      setError('You must agree to the terms and conditions');
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const createdUser = await signup(formData.email, formData.password, formData.name);
+      router.push(createdUser.role === 'admin' ? '/admin' : '/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Signup failed');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-background via-secondary/30 to-background flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary">
+            <BookOpen className="w-6 h-6 text-primary-foreground" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">StudyFlow</h1>
+          <p className="text-sm text-muted-foreground">Create your account</p>
+        </div>
+
+        <Card className="border border-border">
+          <CardHeader className="space-y-1">
+            <CardTitle>Get Started</CardTitle>
+            <CardDescription>Join StudyFlow and start planning your studies</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {error ? (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            ) : null}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Full Name</label>
+                <Input
+                  type="text"
+                  placeholder="John Doe"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Email</label>
+                <Input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Password</label>
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Confirm Password</label>
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={formData.agreeTerms}
+                  onChange={(e) => setFormData({ ...formData, agreeTerms: e.target.checked })}
+                  disabled={isSubmitting}
+                  className="w-4 h-4 border border-input rounded cursor-pointer"
+                />
+                <label htmlFor="terms" className="text-sm text-muted-foreground cursor-pointer">
+                  I agree to the{' '}
+                  <a href="#" className="font-medium text-primary hover:underline">
+                    Terms and Conditions
+                  </a>
+                </label>
+              </div>
+
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? 'Creating account...' : 'Create account'}
+              </Button>
+            </form>
+
+            <div className="text-center text-sm">
+              <p className="text-muted-foreground">
+                Already have an account?{' '}
+                <a href="/login" className="font-medium text-primary hover:underline">
+                  Sign in
+                </a>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-accent/5 border border-accent/30">
+          <CardContent className="pt-4 space-y-3">
+            {[
+              'Personalized study schedules',
+              'Real-time progress tracking',
+              'Assessment management',
+              'Interactive calendar',
+            ].map((benefit, idx) => (
+              <div key={idx} className="flex items-center gap-2 text-sm">
+                <CheckCircle className="w-4 h-4 text-accent shrink-0" />
+                <span className="text-foreground">{benefit}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <div className="text-center text-xs text-muted-foreground">
+          <a href="/" className="hover:text-foreground hover:underline">
+            Back to home
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
