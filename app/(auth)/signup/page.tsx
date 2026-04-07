@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, BookOpen, CheckCircle } from 'lucide-react';
@@ -57,8 +58,9 @@ export default function SignupPage() {
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!validateForm()) return;
 
     setIsSubmitting(true);
@@ -135,7 +137,7 @@ export default function SignupPage() {
                 <label className="text-sm font-medium text-foreground">Password</label>
                 <Input
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="********"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   disabled={isSubmitting}
@@ -146,7 +148,7 @@ export default function SignupPage() {
                 <label className="text-sm font-medium text-foreground">Confirm Password</label>
                 <Input
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="********"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   disabled={isSubmitting}
@@ -163,10 +165,7 @@ export default function SignupPage() {
                   className="w-4 h-4 border border-input rounded cursor-pointer"
                 />
                 <label htmlFor="terms" className="text-sm text-muted-foreground cursor-pointer">
-                  I agree to the{' '}
-                  <a href="#" className="font-medium text-primary hover:underline">
-                    Terms and Conditions
-                  </a>
+                  I agree to the <span className="font-medium text-primary">Terms and Conditions</span>
                 </label>
               </div>
 
@@ -181,10 +180,7 @@ export default function SignupPage() {
 
             <div className="text-center text-sm">
               <p className="text-muted-foreground">
-                Already have an account?{' '}
-                <a href="/login" className="font-medium text-primary hover:underline">
-                  Sign in
-                </a>
+                Already have an account? <Link href="/login" className="font-medium text-primary hover:underline">Sign in</Link>
               </p>
             </div>
           </CardContent>
@@ -207,9 +203,9 @@ export default function SignupPage() {
         </Card>
 
         <div className="text-center text-xs text-muted-foreground">
-          <a href="/" className="hover:text-foreground hover:underline">
+          <Link href="/" className="hover:text-foreground hover:underline">
             Back to home
-          </a>
+          </Link>
         </div>
       </div>
     </div>
