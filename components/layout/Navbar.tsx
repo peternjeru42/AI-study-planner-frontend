@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Bell, BookOpen, LogOut, Menu } from 'lucide-react';
@@ -57,12 +58,12 @@ export const Navbar: React.FC<{ showMenu?: boolean; onMenuToggle?: () => void }>
               <Menu className="w-5 h-5 text-foreground" />
             </button>
           ) : null}
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 rounded-lg px-1 py-1 transition hover:bg-secondary">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shrink-0">
               <BookOpen className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-lg text-foreground hidden sm:inline">StudyFlow</span>
-          </div>
+          </Link>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4">

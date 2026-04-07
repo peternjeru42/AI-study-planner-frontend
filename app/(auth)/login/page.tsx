@@ -87,10 +87,12 @@ function LoginPageContent() {
     <div className="min-h-screen bg-gradient-to-b from-background via-secondary/30 to-background flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary">
-            <BookOpen className="w-6 h-6 text-primary-foreground" />
-          </div>
-          <h1 className="text-2xl font-bold text-foreground">StudyFlow</h1>
+          <Link href="/" className="inline-flex flex-col items-center gap-2 rounded-xl px-3 py-2 transition hover:bg-secondary/60">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary">
+              <BookOpen className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">StudyFlow</h1>
+          </Link>
           <p className="text-sm text-muted-foreground">Sign in to your account</p>
         </div>
 
