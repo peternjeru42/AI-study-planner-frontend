@@ -116,10 +116,7 @@ export default function LandingPage() {
 
             <div className="space-y-6">
               <h1 className="max-w-4xl text-5xl font-black tracking-tight text-slate-950 sm:text-6xl lg:text-7xl">
-                Study with more structure,
-                <span className="block bg-gradient-to-r from-sky-600 via-blue-700 to-emerald-600 bg-clip-text text-transparent">
-                  less stress, and better timing.
-                </span>
+                AI powered study planner.
               </h1>
               <p className="max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
                 Plan assessments, generate focused study sessions, track real progress, and stay ahead with a study workflow that feels intentional from the first deadline to the final exam.
@@ -168,7 +165,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <CardTitle className="text-2xl font-bold">This week&apos;s study rhythm</CardTitle>
-                  <CardDescription className="mt-2 text-sky-100">
+                  <CardDescription className="mt-2 text-slate-950">
                     A cleaner balance between assessments, revision, and protected focus blocks.
                   </CardDescription>
                 </div>
