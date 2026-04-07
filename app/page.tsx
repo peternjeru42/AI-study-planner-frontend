@@ -316,7 +316,7 @@ export default function LandingPage() {
 
       <footer className="border-t border-slate-200/80 bg-white/70 py-10 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 text-sm text-slate-500 sm:px-6 lg:flex-row lg:px-8">
-          <p>&copy; 2024 StudyFlow. All rights reserved.</p>
+          <p>&copy; 2026 StudyFlow. All rights reserved.</p>
           <div className="flex items-center gap-5">
             <Link href="/login" className="transition hover:text-slate-900">
               Sign In
