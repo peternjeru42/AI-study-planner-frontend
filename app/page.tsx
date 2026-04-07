@@ -243,7 +243,7 @@ export default function LandingPage() {
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
           <Card className="overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-950 text-white shadow-[0_36px_90px_-40px_rgba(15,23,42,0.8)]">
             <CardContent className="relative px-6 py-12 text-center sm:px-10 lg:px-16">
-              <div className="absolute inset-x-0 top-0 h-full bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.34),_transparent_42%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.24),_transparent_32%)]" />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-full bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.34),_transparent_42%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.24),_transparent_32%)]" />
               <div className="relative space-y-6">
                 <h3 className="text-3xl font-bold tracking-tight sm:text-4xl">Ready to make your study plan feel deliberate?</h3>
                 <p className="mx-auto max-w-2xl text-lg leading-8 text-slate-300">
