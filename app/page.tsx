@@ -84,9 +84,6 @@ export default function LandingPage() {
             <Link href="#features" className="text-sm font-medium text-slate-600 transition hover:text-slate-950">
               Features
             </Link>
-            <Link href="#testimonials" className="text-sm font-medium text-slate-600 transition hover:text-slate-950">
-              Stories
-            </Link>
             <Button
               onClick={() => router.push('/login')}
               variant="outline"
@@ -240,45 +237,6 @@ export default function LandingPage() {
                 </Card>
               );
             })}
-          </div>
-        </section>
-
-        <section id="testimonials" className="border-y border-slate-200/80 bg-white/60 py-16 lg:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-14 max-w-2xl">
-              <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">Student stories</p>
-              <h2 className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Confident planning creates calmer semesters.</h2>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-3">
-              {[
-                {
-                  name: 'Emily Chen',
-                  role: 'Computer Science Major',
-                  quote: 'StudyFlow gave me a clear weekly plan instead of a constant feeling that I was behind.',
-                },
-                {
-                  name: 'Marcus Johnson',
-                  role: 'Pre-Med Student',
-                  quote: 'Seeing deadlines and study blocks in one flow made my workload feel manageable for the first time.',
-                },
-                {
-                  name: 'Sophia Martinez',
-                  role: 'Engineering Student',
-                  quote: 'The scheduling logic helps me protect deep-work time instead of reacting to deadlines at the last minute.',
-                },
-              ].map((testimonial) => (
-                <Card key={testimonial.name} className="rounded-3xl border border-slate-200 bg-white/90 shadow-[0_24px_50px_-34px_rgba(15,23,42,0.4)]">
-                  <CardContent className="pt-6">
-                    <p className="text-base leading-7 text-slate-700">&ldquo;{testimonial.quote}&rdquo;</p>
-                    <div className="mt-6 border-t border-slate-100 pt-4">
-                      <p className="font-semibold text-slate-950">{testimonial.name}</p>
-                      <p className="text-sm text-slate-500">{testimonial.role}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
           </div>
         </section>
 

@@ -1,29 +1,41 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { Bot, RefreshCw, Sparkles } from 'lucide-react';
 
-import { plannerApi } from '@/lib/api';
+import { PlannerAIModel, PlannerAIResponse, plannerApi } from '@/lib/api';
 import { StudySession } from '@/lib/types';
 import { DateUtils } from '@/lib/utils/date';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function PlannerPage() {
   const [sessions, setSessions] = useState<StudySession[]>([]);
+  const [models, setModels] = useState<PlannerAIModel[]>([]);
+  const [selectedModel, setSelectedModel] = useState('gpt-5-mini');
+  const [question, setQuestion] = useState('What should I focus on this week to stay ahead of deadlines?');
+  const [aiResponse, setAiResponse] = useState<PlannerAIResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [assistantLoading, setAssistantLoading] = useState(false);
   const [error, setError] = useState('');
+  const [assistantError, setAssistantError] = useState('');
 
   const loadData = async () => {
     try {
       setError('');
-      const currentPlan = await plannerApi.current();
+      const [currentPlan, availableModels] = await Promise.all([plannerApi.current(), plannerApi.aiModels()]);
       const currentSessions = (currentPlan?.sessions ?? []).map((session: any) => ({
         ...session,
         startTime: new Date(session.startTime),
         endTime: new Date(session.endTime),
       })) as StudySession[];
       setSessions(currentSessions);
+      setModels(availableModels);
+      const recommendedModel = availableModels.find((item) => item.recommended)?.id;
+      if (recommendedModel) {
+        setSelectedModel(recommendedModel);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load planner');
     }
@@ -48,6 +60,24 @@ export default function PlannerPage() {
       setError(err instanceof Error ? err.message : 'Failed to generate plan');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAskAssistant = async () => {
+    if (!question.trim()) {
+      setAssistantError('Enter a question for the AI study assistant.');
+      return;
+    }
+
+    setAssistantLoading(true);
+    setAssistantError('');
+    try {
+      const result = await plannerApi.aiAssistant({ model: selectedModel, question: question.trim() });
+      setAiResponse(result);
+    } catch (err) {
+      setAssistantError(err instanceof Error ? err.message : 'Failed to generate AI guidance');
+    } finally {
+      setAssistantLoading(false);
     }
   };
 
@@ -93,6 +123,78 @@ export default function PlannerPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card className="border-primary/20 bg-primary/5">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15">
+              <Bot className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <CardTitle>AI Study Assistant</CardTitle>
+              <CardDescription>Use OpenAI models to analyze your current study load and generate tailored guidance.</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-[220px_1fr]">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Model</label>
+              <select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                {models.map((model) => (
+                  <option key={model.id} value={model.id}>
+                    {model.label}{model.recommended ? ' (Recommended)' : ''}
+                  </option>
+                ))}
+              </select>
+              {models.length > 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  {models.find((model) => model.id === selectedModel)?.description}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Question</label>
+              <Textarea
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                rows={4}
+                placeholder="Ask for prioritization, schedule risks, revision strategy, or how to handle multiple deadlines."
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-muted-foreground">
+              The assistant uses your current subjects, pending assessments, and upcoming sessions as context.
+            </p>
+            <Button onClick={handleAskAssistant} disabled={assistantLoading} className="gap-2">
+              <Sparkles className={`h-4 w-4 ${assistantLoading ? 'animate-pulse' : ''}`} />
+              {assistantLoading ? 'Generating Guidance...' : 'Ask AI Assistant'}
+            </Button>
+          </div>
+
+          {assistantError ? <p className="text-sm text-destructive">{assistantError}</p> : null}
+
+          {aiResponse ? (
+            <div className="rounded-xl border border-border bg-background p-4">
+              <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <span className="rounded-full bg-secondary px-2 py-1 text-foreground">{aiResponse.model}</span>
+                <span>{aiResponse.contextSummary.subjectsCount} subjects</span>
+                <span>{aiResponse.contextSummary.assessmentsCount} assessments</span>
+                <span>{aiResponse.contextSummary.sessionsCount} upcoming sessions</span>
+              </div>
+              <p className="mb-3 text-sm font-medium text-foreground">{aiResponse.question}</p>
+              <div className="whitespace-pre-wrap text-sm leading-6 text-foreground">{aiResponse.answer}</div>
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

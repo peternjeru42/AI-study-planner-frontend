@@ -13,6 +13,24 @@ import { apiRequest } from '@/lib/api/client';
 import { tokenStorage } from '@/lib/api/storage';
 import { Assessment, Notification, Progress, ScheduledTask, StudyPreferences, StudySession, Subject, User } from '@/lib/types';
 
+export type PlannerAIModel = {
+  id: string;
+  label: string;
+  description: string;
+  recommended: boolean;
+};
+
+export type PlannerAIResponse = {
+  model: string;
+  question: string;
+  answer: string;
+  contextSummary: {
+    subjectsCount: number;
+    assessmentsCount: number;
+    sessionsCount: number;
+  };
+};
+
 type AuthResponse = {
   access: string;
   refresh: string;
@@ -137,6 +155,12 @@ export const plannerApi = {
   current: async () => apiRequest<any | null>('/planner/current/'),
   generate: async () => apiRequest<any>('/planner/generate/', { method: 'POST', body: JSON.stringify({}) }),
   regenerate: async () => apiRequest<any>('/planner/regenerate/', { method: 'POST', body: JSON.stringify({}) }),
+  aiModels: async (): Promise<PlannerAIModel[]> => apiRequest<PlannerAIModel[]>('/planner/ai/models/'),
+  aiAssistant: async (payload: { model: string; question: string }): Promise<PlannerAIResponse> =>
+    apiRequest<PlannerAIResponse>('/planner/ai/assistant/', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
   today: async (): Promise<StudySession[]> => (await apiRequest<any[]>('/planner/sessions/today/')).map(mapStudySession),
   week: async (): Promise<StudySession[]> => (await apiRequest<any[]>('/planner/sessions/week/')).map(mapStudySession),
   updateStatus: async (id: string, status: StudySession['status']) =>
