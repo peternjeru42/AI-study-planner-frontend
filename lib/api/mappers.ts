@@ -3,6 +3,7 @@ import {
   Notification,
   Progress,
   ScheduledTask,
+  StudyPlan,
   StudyPreferences,
   StudySession,
   Subject,
@@ -84,6 +85,19 @@ export const mapStudySession = (payload: any): StudySession => ({
   sessionDate: payload.sessionDate,
   priorityScore: payload.priorityScore,
   sessionType: payload.sessionType,
+});
+
+export const mapStudyPlan = (payload: any): StudyPlan => ({
+  id: payload.id,
+  title: payload.title,
+  generatedForStartDate: payload.generatedForStartDate,
+  generatedForEndDate: payload.generatedForEndDate,
+  generationTrigger: payload.generationTrigger,
+  status: payload.status,
+  createdAt: new Date(payload.createdAt),
+  updatedAt: new Date(payload.updatedAt),
+  sessions: (payload.sessions ?? []).map(mapStudySession),
+  aiDraft: payload.aiDraft ?? null,
 });
 
 export const mapNotification = (payload: any): Notification => ({

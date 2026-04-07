@@ -62,6 +62,47 @@ export interface StudySession {
   sessionType?: string;
 }
 
+export type StudyScope = 'unit' | 'topic' | 'course';
+export type StudyDurationUnit = 'hours' | 'days' | 'weeks';
+
+export interface AIPlanDraftSession {
+  tempId: string;
+  title: string;
+  sessionDate: string;
+  startTime: string;
+  endTime: string;
+  duration: number;
+  sessionType: string;
+  notes?: string;
+}
+
+export interface AIPlanDraft {
+  title: string;
+  studyScope: StudyScope;
+  targetName: string;
+  durationValue: number;
+  durationUnit: StudyDurationUnit;
+  excludedDays: string[];
+  instructions?: string;
+  summary?: string;
+  startDate: string;
+  endDate: string;
+  sessions: AIPlanDraftSession[];
+}
+
+export interface StudyPlan {
+  id: string;
+  title: string;
+  generatedForStartDate: string;
+  generatedForEndDate: string;
+  generationTrigger: string;
+  status: 'draft' | 'active' | 'archived' | string;
+  createdAt: Date;
+  updatedAt: Date;
+  sessions: StudySession[];
+  aiDraft?: AIPlanDraft | null;
+}
+
 export interface StudyPreferences {
   userId: string;
   courseName?: string;

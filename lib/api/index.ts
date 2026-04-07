@@ -1,4 +1,5 @@
 import {
+  mapStudyPlan,
   mapAssessment,
   mapNotification,
   mapProgress,
@@ -11,7 +12,20 @@ import {
 } from '@/lib/api/mappers';
 import { apiRequest } from '@/lib/api/client';
 import { tokenStorage } from '@/lib/api/storage';
-import { Assessment, Notification, Progress, ScheduledTask, StudyPreferences, StudySession, Subject, User } from '@/lib/types';
+import {
+  AIPlanDraft,
+  Assessment,
+  Notification,
+  Progress,
+  ScheduledTask,
+  StudyPlan,
+  StudyPreferences,
+  StudyScope,
+  StudySession,
+  StudyDurationUnit,
+  Subject,
+  User,
+} from '@/lib/types';
 
 export type PlannerAIModel = {
   id: string;
@@ -29,6 +43,22 @@ export type PlannerAIResponse = {
     assessmentsCount: number;
     sessionsCount: number;
   };
+};
+
+export type PlannerAIDraftResponse = {
+  model: string;
+  promptSummary: string;
+  draft: AIPlanDraft;
+};
+
+export type PlannerAIDraftPayload = {
+  model?: string;
+  studyScope: StudyScope;
+  targetName: string;
+  durationValue: number;
+  durationUnit: StudyDurationUnit;
+  excludedDays: string[];
+  instructions?: string;
 };
 
 type AuthResponse = {
@@ -152,7 +182,11 @@ export const assessmentsApi = {
 };
 
 export const plannerApi = {
-  current: async () => apiRequest<any | null>('/planner/current/'),
+  current: async (): Promise<StudyPlan | null> => {
+    const payload = await apiRequest<any | null>('/planner/current/');
+    return payload ? mapStudyPlan(payload) : null;
+  },
+  plans: async (): Promise<StudyPlan[]> => (await apiRequest<any[]>('/planner/plans/')).map(mapStudyPlan),
   generate: async () => apiRequest<any>('/planner/generate/', { method: 'POST', body: JSON.stringify({}) }),
   regenerate: async () => apiRequest<any>('/planner/regenerate/', { method: 'POST', body: JSON.stringify({}) }),
   aiModels: async (): Promise<PlannerAIModel[]> => apiRequest<PlannerAIModel[]>('/planner/ai/models/'),
@@ -161,6 +195,31 @@ export const plannerApi = {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
+  aiDraft: async (payload: PlannerAIDraftPayload): Promise<PlannerAIDraftResponse> =>
+    apiRequest<PlannerAIDraftResponse>('/planner/ai/draft/', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  aiSave: async (draft: AIPlanDraft & { model?: string }): Promise<{ plan: StudyPlan; sessions: StudySession[] }> => {
+    const payload = await apiRequest<any>('/planner/ai/save/', {
+      method: 'POST',
+      body: JSON.stringify(draft),
+    });
+    return {
+      plan: mapStudyPlan(payload.plan),
+      sessions: (payload.sessions ?? []).map(mapStudySession),
+    };
+  },
+  aiUpdate: async (planId: string, draft: AIPlanDraft & { model?: string }): Promise<{ plan: StudyPlan; sessions: StudySession[] }> => {
+    const payload = await apiRequest<any>(`/planner/ai/plans/${planId}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(draft),
+    });
+    return {
+      plan: mapStudyPlan(payload.plan),
+      sessions: (payload.sessions ?? []).map(mapStudySession),
+    };
+  },
   today: async (): Promise<StudySession[]> => (await apiRequest<any[]>('/planner/sessions/today/')).map(mapStudySession),
   week: async (): Promise<StudySession[]> => (await apiRequest<any[]>('/planner/sessions/week/')).map(mapStudySession),
   updateStatus: async (id: string, status: StudySession['status']) =>
